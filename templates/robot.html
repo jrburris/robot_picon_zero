@@ -1,0 +1,47 @@
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+<body>
+
+<img src="http://192.168.1.142:8081/" /> <!--Enter the IP Address of your Raspberry Pi-->
+<div style="float:right">
+
+</div>
+<div style=" height:400px; width:300px; float:right;">
+<center>
+
+<h1>Surveillance Robot</h2><br><br>
+<a href="#" id="forward" style="font-size:30px;text-decoration:none;">  &#x1F881;&#x1F881;<br>Forward</a><br><br></center>
+<a href="#" id="left" style="font-size:30px;text-decoration:none;"> &#x1F880;&#x1F880;Left</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="#" id="right" style="font-size:30px; text-decoration:none;"> Right &#x1F882;&#x1F882;</a><br><br>
+<center><a href="#" id="reverse" style="font-size:30px;text-decoration:none;"> Reverse<br> &#x1F883;&#x1F883;</a></center>
+</div>
+
+<script>
+$( document ).ready(function(){
+    $("#reverse").on("mousedown", function() {
+     $.get('/reverse');
+     }).on('mouseup', function() {
+     $.get('/stop');
+    });
+    $("#forward").on("mousedown", function() {
+     $.get('/forward');
+     }).on('mouseup', function() {
+     $.get('/stop');
+    });
+    $("#left").on("mousedown", function() {
+     $.get('/left');
+     }).on('mouseup', function() {
+     $.get('/stop');
+    });
+    $("#right").on("mousedown", function() {
+     $.get('/right');
+     }).on('mouseup', function() {
+     $.get('/stop');
+    });
+});
+</script>
+
+</body>
+</html>

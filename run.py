@@ -20,7 +20,7 @@ def robot():
     return render_template('robot.html')
 
 
-@app.route("robot/lights_on")
+@app.route("/robot/lights_on")
 def lights_on():
     pz.init()
     pz.setOutputConfig(1, 1)
@@ -49,7 +49,7 @@ def lights_on():
     return 'lights on'
 
 
-@app.route("/lights_off")
+@app.route("/robot/lights_off")
 def lights_off():
     pz.setOutput(1, 0)
     pz.setOutput(2, 0)
