@@ -12,6 +12,11 @@
 <center>
 
 <h1>Surveillance Robot</h2><br><br>
+<p>
+<button type="button" id="lights_on" name="lights_on">Lights On</button>
+<button type="button" id="lights_off" name="lights_off">Lights Off</button>
+
+</p>
 <a href="#" id="forward" style="font-size:30px;text-decoration:none;">  &#x1F881;&#x1F881;<br>Forward</a><br><br></center>
 <a href="#" id="left" style="font-size:30px;text-decoration:none;"> &#x1F880;&#x1F880;Left</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <a href="#" id="right" style="font-size:30px; text-decoration:none;"> Right &#x1F882;&#x1F882;</a><br><br>
@@ -42,6 +47,24 @@ $( document ).ready(function(){
     });
 });
 </script>
+
+<script>
+    $(document).ready(function () {
+        $('#lights_on').click(function() {
+            console.log('LED On');
+            $.post('/robot/headlights/100');
+        });
+        $('#lights_off').click(function() {
+            console.log('LED Off');
+            $.post('/robot/headlights/0');
+        });
+    });
+
+</script>
+
+<p>Headlights: {{ headlights }} %</p>
+<p>Direction: {{ direction }}</p>
+
 
 </body>
 </html>

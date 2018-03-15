@@ -1,0 +1,10 @@
+[Unit]
+Description=Robot Using Picon Zero
+
+[Service]
+ExecStart=/usr/bin/python /home/pi/robot_picon_zero/run.py
+
+
+[Install]
+WantedBy=multi-user.target
+Alias=robot_picon_zero.service

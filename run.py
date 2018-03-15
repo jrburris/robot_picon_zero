@@ -2,12 +2,16 @@ from flask import Flask
 from flask import render_template
 
 import psutil
-import time
-import piconzero as pz
+import picon
+
 
 app = Flask(__name__)
 
 speed = 100
+direction = 'Stop'
+
+# Initialize pico bits
+lights = picon.lights()
 
 
 @app.route("/")
@@ -17,50 +21,26 @@ def index():
 
 @app.route("/robot")
 def robot():
-    return render_template('robot.html')
+
+    headlights = lights.read_led()
+    return render_template('robot.html', headlights=headlights,
+                           direction=direction)
 
 
-@app.route("/robot/lights_on")
-def lights_on():
-    pz.init()
-    pz.setOutputConfig(1, 1)
-    pz.setOutputConfig(2, 1)
-
-    pz.setOutput(1, 100)
-    pz.setOutput(2, 100)
-
-    # while True:
-    #     pz.setOutput(1, 5)
-    #     pz.setOutput(2, 5)
-    #     # 5% - very dim
-    #     time.sleep(1)
-    #     pz.setOutput(1, 30)
-    #     pz.setOutput(2, 30)
-    #     # 30% - medium
-    #     time.sleep(1)
-    #     pz.setOutput(1, 70)
-    #     pz.setOutput(2, 70)
-    #     # 70% - bright
-    #     time.sleep(1)
-    #     pz.setOutput(1, 100)
-    #     pz.setOutput(2, 100)
-    #     # 100% - maximum
-    #     time.sleep(1)
-    return 'lights on'
-
-
-@app.route("/robot/lights_off")
-def lights_off():
-    pz.setOutput(1, 0)
-    pz.setOutput(2, 0)
-
-    return 'lights off'
+@app.route("/robot/headlights/<int:brightness>", methods=['POST'])
+def headlights(brightness):
+    if brightness <= 100:
+        lights.set_led(brightness)
+    else:
+        return ('Error: LED brightness, should be 0 to 100', 400)
+    return ('', 204)
 
 
 @app.route("/forward")
 def forward():
     pz.forward(speed)
     print 'Forward', speed
+    direction = "Forward"
     return 'true'
 
 
@@ -68,6 +48,7 @@ def forward():
 def reverse():
     pz.reverse(speed)
     print 'Reverse', speed
+    direction = 'Reverse'
     return 'true'
 
 
@@ -75,6 +56,7 @@ def reverse():
 def right():
     pz.spinLeft(speed)
     print 'Spin Right', speed
+    direction = 'Spin Right'
     return 'true'
 
 
@@ -82,6 +64,7 @@ def right():
 def left():
     pz.spinRight(speed)
     print 'Spin Left', speed
+    direction = 'Spin Left'
     return 'true'
 
 
