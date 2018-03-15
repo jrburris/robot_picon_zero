@@ -1,11 +1,11 @@
 # Python library for 4tronix Picon Zero
 # Note that all I2C accesses are wrapped in try clauses with repeats
 
-import smbus
+# import smbus
 import time
 
 # For revision 1 Raspberry Pi, change to bus = smbus.SMBus(0)
-bus = smbus.SMBus(1)
+# bus = smbus.SMBus(1)
 # I2C address of Picon Zero
 pzaddr = 0x22
 
