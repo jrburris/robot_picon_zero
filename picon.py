@@ -23,12 +23,11 @@ class lights(object):
 
     def set_led(self, value):
         global light_status
-        if value > 0:
-            pz.setOutput(1, value)
-            pz.setOutput(2, value)
-
+        if value is True:
+            pz.setOutput(1, 100)
+            pz.setOutput(2, 100)
+            light_status = 1
         else:
             pz.setOutput(1, 0)
             pz.setOutput(2, 0)
-
-        light_status = value
+            light_status = 0

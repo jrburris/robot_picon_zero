@@ -1,5 +1,8 @@
 from flask import Flask
-from flask import render_template
+from flask import render_template, Response
+
+import random
+import time
 
 import psutil
 import picon
@@ -27,13 +30,25 @@ def robot():
                            direction=direction)
 
 
-@app.route("/robot/headlights/<int:brightness>", methods=['POST'])
-def headlights(brightness):
-    if brightness <= 100:
-        lights.set_led(brightness)
+@app.route("/robot/headlights/<int:state>", methods=['POST'])
+def set_headlights(state):
+    if state == 1:
+        lights.set_led(True)
+    elif state == 0:
+        lights.set_led(False)
     else:
-        return ('Error: LED brightness, should be 0 to 100', 400)
+        return ('Error: LED state, should be 0 or 1', 400)
     return ('', 204)
+
+
+@app.route("/robot/headlights")
+def get_headlights():
+    def read_headlights():
+        while True:
+            headlights = lights.read_led()
+            yield 'data: {0}\n\n'.format(headlights)
+            time.sleep(1.0)
+    return Response(read_headlights(), mimetype='text/event-stream')
 
 
 @app.route("/forward")
@@ -100,4 +115,4 @@ def stop():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True, port=5010)
+    app.run(host='0.0.0.0', debug=True, port=5010, threaded=True)

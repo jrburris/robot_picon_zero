@@ -1,27 +1,76 @@
 <html>
 <head>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+
 </head>
 <body>
 
-<img src="http://192.168.1.142:8081/" /> <!--Enter the IP Address of your Raspberry Pi-->
-<div style="float:right">
 
-</div>
-<div style=" height:400px; width:300px; float:right;">
-<center>
+<main role="main">
+<div class="container">
+   <!-- Example row of columns -->
+    <div class="row">
+        <h2>Spy Robot</h2>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
 
-<h1>Surveillance Robot</h2><br><br>
-<p>
-<button type="button" id="lights_on" name="lights_on">Lights On</button>
-<button type="button" id="lights_off" name="lights_off">Lights Off</button>
+            <img src="http://192.168.1.142:8081/" class="img-fluid max-width: 100%" alt="Responsive image">
+        </div>
+        <div class="col-md-4">
 
-</p>
-<a href="#" id="forward" style="font-size:30px;text-decoration:none;">  &#x1F881;&#x1F881;<br>Forward</a><br><br></center>
-<a href="#" id="left" style="font-size:30px;text-decoration:none;"> &#x1F880;&#x1F880;Left</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="#" id="right" style="font-size:30px; text-decoration:none;"> Right &#x1F882;&#x1F882;</a><br><br>
-<center><a href="#" id="reverse" style="font-size:30px;text-decoration:none;"> Reverse<br> &#x1F883;&#x1F883;</a></center>
-</div>
+            <center>
+            <button type="button" class= "btn btn-secondary" id="lights_on" name="lights_on">Lights On</button>
+            <button type="button" class= "btn btn-secondary" id="lights_off" name="lights_off">Lights Off</button>
+            </center>
+            <p>
+            <center>
+                <a href="#" id="forward" style="font-size:30px;text-decoration:none;">Forward</a><br><br>
+            </center>
+            <center>
+            <a href="#" id="left" style="font-size:30px;text-decoration:none;">Left                </a>
+            <a href="#" id="right" style="font-size:30px; text-decoration:none;">Right</a><br><br>
+            </center>
+
+            <center>
+                <a href="#" id="reverse" style="font-size:30px;text-decoration:none;">Reverse</a>
+            </center>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-4">
+            <h3>Sensors</h3>
+            <p>Headlights: <span id="headlight_value" class="label"></span></p>
+        </div>
+        <div class="col-md-4">
+            <h3>Motors</h3>
+            <p>Direction: {{ direction }}</p>
+        </div>
+        <div class="col-md-4">
+            <h3>System</h3>
+
+        </div>
+    </div>
+
+
+
+ </div> <!-- /container -->
+
+
+
+
+
+
+
+</main>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 
 <script>
 $( document ).ready(function(){
@@ -52,18 +101,41 @@ $( document ).ready(function(){
     $(document).ready(function () {
         $('#lights_on').click(function() {
             console.log('LED On');
-            $.post('/robot/headlights/100');
+            $.post('/robot/headlights/1');
         });
         $('#lights_off').click(function() {
             console.log('LED Off');
             $.post('/robot/headlights/0');
         });
-    });
+
+
+    // Function to update the switch state on the page.
+    function updateHeadlights(headlightState) {
+        // $('#headlight_value').text(headlightState);
+        if (headlightState === '0') {
+          $('#headlight_value').text('Off');
+          $('#headlight_value').toggleClass('label-danger', false);
+          $('#headlight_value').toggleClass('label-default', true);
+        }
+        else if (headlightState === '1') {
+          $('#headlight_value').text('On');
+          $('#headlight_value').toggleClass('label-danger', true);
+          $('#headlight_value').toggleClass('label-default', false);
+        }
+    }
+
+    // Setup switch server sent event receiver.
+    var headlightSource = new EventSource("{{ url_for('get_headlights') }}");
+    headlightSource.onmessage = function(e) {
+        updateHeadlights(e.data);
+    }
+        // Set the switch based on the value passed to this template.
+        updateHeadlights('{{ headlights }}');
+  });
 
 </script>
 
-<p>Headlights: {{ headlights }} %</p>
-<p>Direction: {{ direction }}</p>
+
 
 
 </body>
