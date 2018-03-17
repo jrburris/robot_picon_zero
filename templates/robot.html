@@ -45,7 +45,8 @@
     <div class="row">
         <div class="col-md-4">
             <h3>Sensors</h3>
-            <p>Headlights: <span id="headlight_value" class="label"></span></p>
+            <p>Headlights: <span class="badge badge-secondary" id="headlight_value"></span></p>
+
         </div>
         <div class="col-md-4">
             <h3>Motors</h3>
@@ -100,38 +101,37 @@ $( document ).ready(function(){
 <script>
     $(document).ready(function () {
         $('#lights_on').click(function() {
-            console.log('LED On');
+            // console.log('LED On');
             $.post('/robot/headlights/1');
         });
         $('#lights_off').click(function() {
-            console.log('LED Off');
+            // console.log('LED Off');
             $.post('/robot/headlights/0');
         });
 
 
-    // Function to update the switch state on the page.
-    function updateHeadlights(headlightState) {
-        // $('#headlight_value').text(headlightState);
-        if (headlightState === '0') {
-          $('#headlight_value').text('Off');
-          $('#headlight_value').toggleClass('label-danger', false);
-          $('#headlight_value').toggleClass('label-default', true);
+        // Function to update the switch state on the page.
+        function updateHeadlights(headlightState) {
+            if (headlightState === '0') {
+              $('#headlight_value').text('Off');
+              $('#headlight_value').toggleClass('badge-success', false);
+              $('#headlight_value').toggleClass('badge-danger', true);
+            }
+            else if (headlightState === '1') {
+              $('#headlight_value').text('On');
+              $('#headlight_value').toggleClass('badge-success', true);
+              $('#headlight_value').toggleClass('badge-danger', false);
+            }
         }
-        else if (headlightState === '1') {
-          $('#headlight_value').text('On');
-          $('#headlight_value').toggleClass('label-danger', true);
-          $('#headlight_value').toggleClass('label-default', false);
-        }
-    }
 
-    // Setup switch server sent event receiver.
-    var headlightSource = new EventSource("{{ url_for('get_headlights') }}");
-    headlightSource.onmessage = function(e) {
-        updateHeadlights(e.data);
-    }
-        // Set the switch based on the value passed to this template.
-        updateHeadlights('{{ headlights }}');
-  });
+        // Setup switch server sent event receiver.
+        var headlightSource = new EventSource("{{ url_for('get_headlights') }}");
+        headlightSource.onmessage = function(e) {
+            updateHeadlights(e.data);
+        }
+            // Set the switch based on the value passed to this template.
+            updateHeadlights('{{ headlights }}');
+    });
 
 </script>
 
