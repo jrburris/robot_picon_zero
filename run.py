@@ -13,6 +13,7 @@ direction = 'Stop'
 
 # Initialize pico bits
 lights = picon.lights()
+motors = picon.motors()
 
 
 @app.route("/robot")
@@ -43,43 +44,32 @@ def get_headlights():
     return Response(read_headlights(), mimetype='text/event-stream')
 
 
-@app.route("/forward")
-def forward():
-    pz.forward(speed)
-    print 'Forward', speed
-    direction = "Forward"
-    return 'true'
+@app.route("/robot/direction")
+def get_direction():
+    def read_direction():
+        while True:
+            direction = motors.read_direction()
+            yield 'data: {0}\n\n'.format(direction)
+            time.sleep(1.0)
+    return Response(read_direction(), mimetype='text/event-stream')
 
 
-@app.route("/reverse")
-def reverse():
-    pz.reverse(speed)
-    print 'Reverse', speed
-    direction = 'Reverse'
-    return 'true'
+@app.route("/robot/forward")
+def go_forward():
+    motors.forward()
+    return ('', 204)
 
 
-@app.route("/right")
-def right():
-    pz.spinLeft(speed)
-    print 'Spin Right', speed
-    direction = 'Spin Right'
-    return 'true'
+@app.route("/robot/reverse")
+def go_reverse():
+    motors.reverse()
+    return ('', 204)
 
 
-@app.route("/left")
-def left():
-    pz.spinRight(speed)
-    print 'Spin Left', speed
-    direction = 'Spin Left'
-    return 'true'
-
-
-@app.route('/stop')
+@app.route("/robot/stop")
 def stop():
-    pz.stop()
-    print 'Stop'
-    return 'true'
+    motors.stop()
+    return ('', 204)
 
 
 if __name__ == "__main__":

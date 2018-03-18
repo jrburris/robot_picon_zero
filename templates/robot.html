@@ -2,10 +2,10 @@
 <head>
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/table.css') }}">
 
 </head>
 <body>
-
 
 <main role="main">
 <div class="container">
@@ -14,29 +14,56 @@
         <h2>Spy Robot</h2>
     </div>
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-6">
 
             <img src="http://192.168.1.142:8081/" class="img-fluid max-width: 100%" alt="Responsive image">
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
 
-            <center>
-            <button type="button" class= "btn btn-secondary" id="lights_on" name="lights_on">Lights On</button>
-            <button type="button" class= "btn btn-secondary" id="lights_off" name="lights_off">Lights Off</button>
-            </center>
-            <p>
-            <center>
-                <a href="#" id="forward" style="font-size:30px;text-decoration:none;">Forward</a><br><br>
-            </center>
-            <center>
-            <a href="#" id="left" style="font-size:30px;text-decoration:none;">Left                </a>
-            <a href="#" id="right" style="font-size:30px; text-decoration:none;">Right</a><br><br>
-            </center>
+            <div class="divTable">
+                <div class="divTableBody">
+<!-- -->
+                <div class="divTableRow">
+                    <div class="divTableCell">
+                        <button type="button" class= "btn btn-secondary" id="lights_on" name="lights_on">Lights On</button>
+                    </div>
+                    <div class="divTableCell"></div>
+                    <div class="divTableCell">
+                        <button type="button" class= "btn btn-secondary" id="lights_off" name="lights_off">Lights Off</button>
+                    </div>
+                </div>
+<!-- -->
+                <div class="divTableRow">
+                </div>
+<!-- -->
+                <div class="divTableRow">
+                    <div class="divTableCell">&nbsp;</div>
+                    <div class="divTableCell">
+                        <button type="button" class= "btn btn-primary" id="forward">Forward</button>
+                    </div>
+                    <div class="divTableCell">&nbsp;</div>
+                </div>
+    <!-- -->
+                <div class="divTableRow">
+                    <div class="divTableCell">
+                        <button type="button" class= "btn btn-primary" id="left">Left</button>
+                    </div>
+                    <div class="divTableCell">&nbsp;</div>
+                    <div class="divTableCell">
+                        <button type="button" class= "btn btn-primary" id="right">Right</button>
+                    </div>
+                </div>
+    <!-- -->
+                <div class="divTableRow">
+                    <div class="divTableCell">&nbsp;</div>
+                    <div class="divTableCell">
+                        <button type="button" class= "btn btn-primary" id="reverse">Reverse</button>
+                    </div>
+                    <div class="divTableCell">&nbsp;</div>
+                </div>
+            </div>
 
-            <center>
-                <a href="#" id="reverse" style="font-size:30px;text-decoration:none;">Reverse</a>
-            </center>
-            </p>
+
         </div>
     </div>
     <div class="row">
@@ -50,7 +77,8 @@
         </div>
         <div class="col-md-4">
             <h3>Motors</h3>
-            <p>Direction: {{ direction }}</p>
+            <p>Direction: <span class="badge badge-secondary" id="direction_value"></span></p>
+            <!-- <p>Direction: {{ direction }}</p> -->
         </div>
         <div class="col-md-4">
             <h3>System</h3>
@@ -76,64 +104,90 @@
 <script>
 $( document ).ready(function(){
     $("#reverse").on("mousedown", function() {
-     $.get('/reverse');
-     }).on('mouseup', function() {
-     $.get('/stop');
+        $.get('/robot/reverse');
+        }).on('mouseup', function() {
+            $.get('/robot/stop');
     });
     $("#forward").on("mousedown", function() {
-     $.get('/forward');
-     }).on('mouseup', function() {
-     $.get('/stop');
+        $.get('/robot/forward');
+        }).on('mouseup', function() {
+            $.get('/robot/stop');
     });
     $("#left").on("mousedown", function() {
-     $.get('/left');
-     }).on('mouseup', function() {
-     $.get('/stop');
+        $.get('/robot/left');
+        }).on('mouseup', function() {
+            $.get('/robot/stop');
     });
     $("#right").on("mousedown", function() {
-     $.get('/right');
-     }).on('mouseup', function() {
-     $.get('/stop');
+        $.get('/robot/right');
+        }).on('mouseup', function() {
+            $.get('/robot/stop');
     });
+    $('#lights_on').click(function() {
+        // console.log('LED On');
+        $.post('/robot/headlights/1');
+    });
+    $('#lights_off').click(function() {
+        // console.log('LED Off');
+        $.post('/robot/headlights/0');
+    });
+
+// Function to update the switch state on the page.
+function updateHeadlights(headlightState) {
+    if (headlightState === '0') {
+      $('#headlight_value').text('Off');
+      $('#headlight_value').toggleClass('badge-success', false);
+      $('#headlight_value').toggleClass('badge-danger', true);
+    }
+    else if (headlightState === '1') {
+      $('#headlight_value').text('On');
+      $('#headlight_value').toggleClass('badge-success', true);
+      $('#headlight_value').toggleClass('badge-danger', false);
+    }
+}
+
+// Setup headlights server sent event receiver.
+var headlightSource = new EventSource("{{ url_for('get_headlights') }}");
+headlightSource.onmessage = function(e) {
+    updateHeadlights(e.data);
+}
+    // Set the switch based on the value passed to this template.
+    updateHeadlights('{{ headlights }}');
+
+// Function to update the switch state on the page.
+function updateDirection(directionState) {
+    if (directionState === 'Stop') {
+      $('#direction_value').text('Stop');
+      $('#direction_value').toggleClass('badge-success', false);
+      $('#direction_value').toggleClass('badge-danger', true);
+      $('#forward').toggleClass('btn-danger', false);
+    }
+    else {
+      $('#direction_value').text(directionState);
+      $('#direction_value').toggleClass('badge-success', true);
+      $('#direction_value').toggleClass('badge-danger', false);
+      $('#forward').toggleClass('btn-danger', true);
+
+      $('#direction_value').toggleClass('badge-success', true);
+      $('#direction_value').toggleClass('badge-danger', false);
+
+    }
+}
+
+// Setup motor server sent event receiver.
+var directionSource = new EventSource("{{ url_for('get_direction') }}");
+directionSource.onmessage = function(e) {
+    updateDirection(e.data);
+}
+
+// Set the switch based on the value passed to this template.
+updateDirection('{{ directions }}');
+
+
 });
 </script>
 
-<script>
-    $(document).ready(function () {
-        $('#lights_on').click(function() {
-            // console.log('LED On');
-            $.post('/robot/headlights/1');
-        });
-        $('#lights_off').click(function() {
-            // console.log('LED Off');
-            $.post('/robot/headlights/0');
-        });
 
-
-        // Function to update the switch state on the page.
-        function updateHeadlights(headlightState) {
-            if (headlightState === '0') {
-              $('#headlight_value').text('Off');
-              $('#headlight_value').toggleClass('badge-success', false);
-              $('#headlight_value').toggleClass('badge-danger', true);
-            }
-            else if (headlightState === '1') {
-              $('#headlight_value').text('On');
-              $('#headlight_value').toggleClass('badge-success', true);
-              $('#headlight_value').toggleClass('badge-danger', false);
-            }
-        }
-
-        // Setup switch server sent event receiver.
-        var headlightSource = new EventSource("{{ url_for('get_headlights') }}");
-        headlightSource.onmessage = function(e) {
-            updateHeadlights(e.data);
-        }
-            // Set the switch based on the value passed to this template.
-            updateHeadlights('{{ headlights }}');
-    });
-
-</script>
 
 
 

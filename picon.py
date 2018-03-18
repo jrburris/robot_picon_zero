@@ -63,6 +63,33 @@ class motors():
             motor_direction = 'Forward'
             return motor_direction
 
+    def reverse(self):
+        """ Move both motors backwards """
+        global motor_speed
+        global motor_direction
+        with self._lock:
+            pz.reverse(motor_speed)
+            motor_direction = 'Reverse'
+            return motor_direction
+
+    def spin_right(self):
+        """ Rotate to the right """
+        global motor_speed
+        global motor_direction
+        with self._lock:
+            pz.spinLeft(motor_speed)
+            motor_direction = 'Spin Right'
+            return motor_direction
+
+    def spin_left(self):
+        """ Rotate to the left """
+        global motor_speed
+        global motor_direction
+        with self._lock:
+            pz.spinRight(motor_speed)
+            motor_direction = 'Spin Left'
+            return motor_direction
+
     def stop(self):
         global motor_direction
         with self._lock:
